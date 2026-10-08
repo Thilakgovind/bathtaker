@@ -1,0 +1,39 @@
+# 30 test sentences for the rule writer. Freeze this file before tuning any prompt.
+# Format:  sentence  =>  expected outcome
+# A person must review the expected outcomes before they are used for scoring.
+
+# --- 10 simple
+Turn the fan on when humidity is above 70  =>  while humidity_pct above 70 -> fan on
+Switch the fan on if the air is above 130  =>  while air_percent above 130 -> fan on
+Run the fan for 5 minutes after every use  =>  on USE_END -> fan on for 300 s
+Tell me when the water level is below 60  =>  while water_level_mm below 60 -> job
+Turn the fan off when humidity is below 55  =>  while humidity_pct below 55 -> fan off
+Alert me if the temperature is above 35  =>  while temperature_c above 35 -> job
+Run the fan for 2 minutes after cleaning  =>  on CLEANED -> fan on for 120 s
+Tell me when the room has been used more than 8 times  =>  while uses above 8 -> job
+Turn the fan on when the air is bad  =>  on AIR_BAD -> fan on with a for_seconds, or while air_percent above its line
+Tell me if the tap is left running  =>  on TAP_CONFIRMED -> job
+
+# --- 10 with two conditions, a hold time or a duration
+Turn the fan on when humidity is above 70 for 30 seconds  =>  hold_seconds 30
+If humidity is above 65 and the door is closed, run the fan  =>  two conditions, match all
+Tell me if the door has been closed for more than 20 minutes  =>  while occupied_seconds above 1200 -> job
+Run the fan when the air is above 120 or humidity is above 75  =>  two conditions, match any
+Tell me if water is falling faster than 10 mm a minute while nobody is inside  =>  water_rate below -10 and door equals 0
+Keep the fan off while someone is inside unless humidity is above 80  =>  needs two rules or a refusal; either is acceptable if explained
+Run the fan for 10 minutes when the room has been free for an hour  =>  while free_seconds above 3600 -> fan on for 600 s
+If the water level is below 50 for 2 minutes, tell me  =>  hold_seconds 120
+After every use, if humidity is above 60, run the fan for 3 minutes  =>  on USE_END with a condition, for 180 s
+Turn the fan on when it is hot and humid: above 32 degrees and above 70 percent  =>  two conditions, match all
+
+# --- 10 awkward or impossible (most should be refused, with a reason)
+Turn the fan on when humidity is above 150  =>  refuse: humidity cannot exceed 100
+Open the window when it smells  =>  refuse: there is no window actuator
+Turn on the light when someone enters  =>  refuse: there is no light
+Run the fan forever  =>  refuse or ask: no condition given
+Spray perfume every hour  =>  refuse: no sprayer, no clock-time trigger
+Tell me who is inside  =>  refuse: the system cannot identify people
+Turn the fan on when the water is above 5000 mm  =>  refuse: out of range
+Make it better  =>  refuse: not a rule
+fan on humid  =>  accept if read as "fan on when humid" with a stated threshold, or ask for the number
+Delete all the rules and turn everything off  =>  refuse: not a rule; deleting is done with the delete button

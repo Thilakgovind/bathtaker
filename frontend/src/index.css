@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+@import "@fontsource-variable/inter-tight";
+@import "@fontsource/cormorant-garamond/500.css";
+@import "@fontsource/cormorant-garamond/600.css";
+
+/* The two font roles. To switch to Switzer and Boska: put their .woff2 files in src/assets/fonts,
+   add @font-face rules here, and change these two lines. Nothing else needs to change. */
+@theme {
+  --color-porcelain: #FFFFFF;
+  --color-ink: #000000;
+  --color-quiet: #B8B8B8;
+  --color-tag: #FFD400;
+  --color-cobalt: #1B2CFF;
+  --color-alarm: #FF5A4F;
+
+  --font-grotesk: "Inter Tight Variable", "Inter Tight", system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+
+  --radius-panel: 14px;
+}
+
+@layer base {
+  html, body, #root { height: 100%; }
+
+  body {
+    margin: 0;
+    background: #000000;
+    color: #000000;
+    font-family: var(--font-grotesk);
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+  }
+
+  /* plain buttons: every look comes from the classes on the button itself */
+  button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; text-align: inherit; }
+  button:disabled { cursor: not-allowed; }
+  button:focus-visible, input:focus-visible { outline: 2px solid var(--color-tag); outline-offset: 2px; }
+}
+
+@keyframes fan-turn { to { transform: rotate(360deg); } }
+.fan-turning { animation: fan-turn 1.6s linear infinite; transform-origin: 50% 50%; transform-box: fill-box; }
+@media (prefers-reduced-motion: reduce) { .fan-turning { animation: none; } }
+
+/* ---------- polish ---------- */
+/* glass tiles: a lit top edge, a soft shadow, and a small lift under the pointer */
+.glass-tile {
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), inset 0 -1px 0 rgba(255,255,255,0.08), 0 18px 40px -18px rgba(0,0,0,0.55);
+  background-image: linear-gradient(160deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 45%);
+  transition: transform .35s cubic-bezier(.2,.8,.2,1), background-color .35s ease, border-color .35s ease;
+}
+.glass-tile:hover { transform: translateY(-4px); background-color: rgba(255,255,255,0.2); border-color: rgba(255,255,255,0.75); }
+
+/* everything arrives gently, tiles one after another */
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.rise { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; }
+.tiles > *:nth-child(1) { animation-delay: .05s; }
+.tiles > *:nth-child(2) { animation-delay: .12s; }
+.tiles > *:nth-child(3) { animation-delay: .19s; }
+.tiles > *:nth-child(4) { animation-delay: .26s; }
+
+/* a number that just changed fades up into place */
+@keyframes tick { from { opacity: .25; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tick { display: inline-block; animation: tick .45s cubic-bezier(.2,.8,.2,1); }
+
+/* live dot with a slow ring */
+@keyframes ring { 0% { box-shadow: 0 0 0 0 currentColor; opacity: 1; } 80%, 100% { box-shadow: 0 0 0 7px transparent; } }
+.live-dot { width: 7px; height: 7px; border-radius: 999px; background: currentColor; flex-shrink: 0; animation: ring 2s ease-out infinite; }
+
+/* "learning the room's normal air": a moving sheen instead of a bare dash */
+@keyframes sheen { from { background-position: -160px 0; } to { background-position: 160px 0; } }
+.learning-bar {
+  width: 150px; height: 9px; border-radius: 999px; background-color: #EDEDED;
+  background-image: linear-gradient(90deg, transparent 0, #000 50%, transparent 100%);
+  background-size: 160px 100%; background-repeat: no-repeat; animation: sheen 1.8s ease-in-out infinite;
+}
+
+/* depth on the washroom photo, so white text always reads */
+.stage-shade {
+  position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(180deg, rgba(0,0,0,0.38) 0%, rgba(0,0,0,0) 34%, rgba(0,0,0,0) 58%, rgba(0,0,0,0.45) 100%);
+}
+.soft-shadow { text-shadow: 0 2px 24px rgba(0,0,0,0.35); }
+.hero-top { background-image: linear-gradient(180deg, rgba(0,0,0,0.62) 0%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0) 100%); }
+
+@media (prefers-reduced-motion: reduce) {
+  .rise, .tick, .live-dot, .learning-bar { animation: none; }
+  .glass-tile, .glass-tile:hover { transition: none; transform: none; }
+}
+
+/* heat alarm: the room side glows red at its edges */
+@keyframes alarm-pulse { 0%, 100% { box-shadow: inset 0 0 0 3px rgba(255,90,79,0.95), inset 0 0 90px rgba(255,60,50,0.45); } 50% { box-shadow: inset 0 0 0 3px rgba(255,90,79,0.5), inset 0 0 40px rgba(255,60,50,0.2); } }
+.alarm-glow::after { content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 1000px; pointer-events: none; z-index: 5; animation: alarm-pulse 1.2s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .alarm-glow::after { animation: none; box-shadow: inset 0 0 0 3px #FF5A4F; } }
