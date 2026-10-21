@@ -18,8 +18,10 @@ def main():
     ap = argparse.ArgumentParser(description="Washroom caretaker: laptop program")
     ap.add_argument("--port", default=os.environ.get("CARETAKER_PORT"),
                     help="Serial port of the room board (COM5, /dev/ttyUSB0) or socket://localhost:5555")
-    ap.add_argument("--http", type=int, default=8000, help="Web port (default 8000)")
-    ap.add_argument("--host", default="127.0.0.1", help="Use 0.0.0.0 to open the screen from a phone on the same Wi-Fi")
+    ap.add_argument("--http", type=int, default=int(os.environ.get("PORT", "8000")),
+                    help="Web port (default 8000, or $PORT)")
+    ap.add_argument("--host", default=os.environ.get("HOST", "0.0.0.0" if os.environ.get("PORT") else "127.0.0.1"),
+                    help="Host to bind (default 127.0.0.1 or 0.0.0.0 when $PORT is set)")
     ap.add_argument("--db", default=None, help="Database file (default data/caretaker.db)")
     a = ap.parse_args()
     print("Board port:", a.port or "none chosen")
